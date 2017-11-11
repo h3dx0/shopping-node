@@ -6,13 +6,16 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var expressHbs = require('express-handlebars');
 var index = require('./routes/index');
-var users = require('./routes/users');
+var usersRoutes  = require('./routes/users');
 var mongoose = require('mongoose');
 var session = require('express-session');
+var passport = require('passport');
+var validator = require('express-validator');
+var flash = require('connect-flash');
 var app = express();
 
-mongoose.connect('localhost:27017/shopping')
-
+mongoose.connect('localhost:27017/shopping');
+require('./config/passport');
 // view engine setup
 app.engine('.hbs', expressHbs({defaultLayout: 'layout', extname: '.hbs'}))
 app.set('view engine', '.hbs');
@@ -22,11 +25,24 @@ app.set('view engine', '.hbs');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+//este siempre va despues d body-parser
+app.use(validator());
 app.use(cookieParser());
 app.use(session({secret: 'mycodesecret', resave: false, saveUninitialized: false }));
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//creando un middleware
+app.use(function (req, res, next) {
+    //para agregar la variable login a todas los view(.hbs)
+    res.locals.login = req.isAuthenticated();
+    next();
+});
+
 app.use('/', index);
+app.use('/user', usersRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

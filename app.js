@@ -5,13 +5,16 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var expressHbs = require('express-handlebars');
-var index = require('./routes/index');
-var usersRoutes  = require('./routes/users');
 var mongoose = require('mongoose');
 var session = require('express-session');
 var passport = require('passport');
 var validator = require('express-validator');
 var flash = require('connect-flash');
+var mongoStore = require('connect-mongo')(session);
+
+var index = require('./routes/index');
+var usersRoutes  = require('./routes/users');
+
 var app = express();
 
 mongoose.connect('localhost:27017/shopping');
@@ -28,16 +31,29 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //este siempre va despues d body-parser
 app.use(validator());
 app.use(cookieParser());
-app.use(session({secret: 'mycodesecret', resave: false, saveUninitialized: false }));
+app.use(session({
+    secret: 'mycodesecret',
+    resave: false,
+    saveUninitialized: false,
+    //guardando la session en la BD
+    store: new mongoStore({
+        mongooseConnection: mongoose.connection
+    }),
+    cookie: { maxAge: 180 * 60 * 1000}
+}));
 app.use(flash());
+
+//config d passport
 app.use(passport.initialize());
 app.use(passport.session());
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 //creando un middleware
 app.use(function (req, res, next) {
-    //para agregar la variable login a todas los view(.hbs)
+    //para agregar la variable login y session a todas los view(.hbs)
     res.locals.login = req.isAuthenticated();
+    res.locals.session = req.session;
     next();
 });
 

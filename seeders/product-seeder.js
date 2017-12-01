@@ -38,5 +38,5 @@ for (let i = 0; i < products.length; i++) {
   });
 }
 function exit() {
-  mongoose.connect('localhost:27017/shopping')  
+  mongoose.connect('localhost:27017/shopping')
 }

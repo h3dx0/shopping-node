@@ -1,12 +1,14 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-
-var schema = new Schema({
-    user: {type: Schema.Types.ObjectId, ref: 'User'},
-    cart: {type: Object, required: true},
-    address: {type: String, required: true},
-    name: {type: String, required: true},
-    paymentId: {type: String, required: true}
-});
-
-module.exports = mongoose.model('Order', schema);
+'use strict';
+module.exports = (sequelize, DataTypes) => {
+  var Order = sequelize.define('Order', {
+    address: DataTypes.STRING,
+    paymentId: DataTypes.STRING
+  }, {
+    classMethods: {
+      associate: function(models) {
+        // associations can be defined here
+      }
+    }
+  });
+  return Order;
+};

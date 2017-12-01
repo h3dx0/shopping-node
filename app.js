@@ -1,23 +1,20 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var expressHbs = require('express-handlebars');
-var mongoose = require('mongoose');
-var session = require('express-session');
-var passport = require('passport');
-var validator = require('express-validator');
-var flash = require('connect-flash');
-var mongoStore = require('connect-mongo')(session);
+let express = require('express');
+let path = require('path');
+let favicon = require('serve-favicon');
+let logger = require('morgan');
+let cookieParser = require('cookie-parser');
+let bodyParser = require('body-parser');
+let expressHbs = require('express-handlebars');
+let session = require('express-session');
+let passport = require('passport');
+let validator = require('express-validator');
+let flash = require('connect-flash');
 
-var index = require('./routes/index');
-var usersRoutes  = require('./routes/users');
+let index = require('./routes/index');
+let usersRoutes  = require('./routes/users');
 
-var app = express();
+let app = express();
 
-mongoose.connect('localhost:27017/shopping');
 require('./config/passport');
 // view engine setup
 app.engine('.hbs', expressHbs({defaultLayout: 'layout', extname: '.hbs'}))
@@ -31,16 +28,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //este siempre va despues d body-parser
 app.use(validator());
 app.use(cookieParser());
-app.use(session({
-    secret: 'mycodesecret',
-    resave: false,
-    saveUninitialized: false,
-    //guardando la session en la BD
-    store: new mongoStore({
-        mongooseConnection: mongoose.connection
-    }),
-    cookie: { maxAge: 180 * 60 * 1000}
-}));
+// app.use(session({
+//     secret: 'mycodesecret',
+//     resave: false,
+//     saveUninitialized: false,
+//     //guardando la session en la BD
+//     store: new (require('connect-pg-simple')(session))(),
+//     cookie: { maxAge: 180 * 60 * 1000}
+// }));
 app.use(flash());
 
 //config d passport
@@ -62,7 +57,7 @@ app.use('/user', usersRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
+  let err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
